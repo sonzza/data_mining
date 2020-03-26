@@ -15,7 +15,6 @@ def get_post_url(soap: bs4.BeautifulSoup) -> set:
 
 def get_next_page(soap: bs4.BeautifulSoup) -> str:
     a = soap.find('a', attrs={'id': 'next_page'})
-    # a = div.find("a")
     return f'{BASE_URL}{a["href"]}' if a else None
 
 
@@ -42,9 +41,9 @@ def get_post_data(post_url: str) -> dict:
     soap = bs4.BeautifulSoup(response.text, 'lxml')
     template_data['title'] = soap.select_one('div.post__wrapper h1 span').text
     template_data['url'] = post_url
-    template_data['coment_count'] = soap.select_one('span.comments-section__head-counter',
-                                                    attrs={'id': 'comments_count'}).text.replace('\n', '').replace(' ',
-                                                                                                                   '')
+    template_data['comment_count'] = soap.select_one('span.comments-section__head-counter',
+                                                     attrs={'id': 'comments_count'}).text.replace('\n', '').replace(' ',
+                                                                                                                    '')
     template_data['public_time'] = soap.select_one('span.post__time').text
     template_data['writer']['name'] = soap.select_one('span.user-info__nickname').text
     template_data['writer']['url'] = soap.select_one('div.post__wrapper header a')['href']
@@ -63,4 +62,4 @@ if __name__ == '__main__':
             with open('{name}.json'.format(name=post['title'].replace('/', '_')), 'w') as file:
                 file.write(json.dumps(post))
 
-    print(1)
+
