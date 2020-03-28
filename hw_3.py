@@ -84,27 +84,15 @@ if __name__ == '__main__':
     Base = declarative_base()
 
     association_table = Table('association', Base.metadata,
-                              Column('post_id', Integer, ForeignKey('comment_writer.id')),
-                              Column('comment_writer_id', Integer, ForeignKey('post.id')))
-
-    class Comment_writer(Base):
-        __tablename__ = 'comment_writer'
-        id = Column(Integer, primary_key=True, autoincrement=True)
-        name = Column(String, unique=False, nullable=False)
-        url = Column(String, unique=True, nullable=False)
-        # post = relationship('Post', back_populates='comment_writer')
-
-        def __init__(self, name, url, post):
-            self.name = name
-            self.url = url
-            self.post = post
+                              Column('post', Integer, ForeignKey('comment_writer.id')),
+                              Column('comment_writer', Integer, ForeignKey('post.id')))
 
 
     class Writer(Base):
         __tablename__ = 'writer'
         id = Column(Integer, primary_key=True, autoincrement=True)
         name = Column(String, unique=False, nullable=False)
-        url = Column(String, unique=True, nullable=False)
+        url = Column(String, unique=False, nullable=False)
 
         def __init__(self, name, url):
             self.name = name
@@ -115,11 +103,11 @@ if __name__ == '__main__':
         __tablename__ = 'post'
         id = Column(Integer, primary_key=True, autoincrement=True)
         title = Column(String, unique=False, nullable=False)
-        url = Column(String, unique=True, nullable=False)
+        url = Column(String, unique=False, nullable=False)
         comment_count = Column(String, unique=False, nullable=True)
         writer_id = Column(Integer, ForeignKey('writer.id'))
         writer = relationship('Writer', backref='post')
-        comment_writer = relationship('Comment_writer',  secondary=association_table)
+        comment_writer = relationship('Comment_writer',  secondary=association_table, backref='post')
 
         def __init__(self, title, url, comment_count, writer):
             self.title = title
@@ -128,12 +116,24 @@ if __name__ == '__main__':
             self.writer = writer
 
 
+    class Comment_writer(Base):
+        __tablename__ = 'comment_writer'
+        id = Column(Integer, primary_key=True, autoincrement=True)
+        name = Column(String, unique=False, nullable=False)
+        url = Column(String, unique=False, nullable=False)
+
+        def __init__(self, name, url, post_id):
+            self.name = name
+            self.url = url
+            self.post_id = post_id
+
+
     engine = create_engine('sqlite:///habr_blog.db')
     Base.metadata.create_all(engine)
 
-    session_db = sessionmaker(bind=engine)
+    Session = sessionmaker(bind=engine)
 
-    session = session_db()
+    session = Session()
 
     for soap in get_page(URL):
         posts = get_post_url(soap)
@@ -146,9 +146,11 @@ if __name__ == '__main__':
                 sql_comment_writer = Comment_writer(item,
                                                     data['comment_writers'][item], sql_post.id)
                 sql_comment_writers.append(sql_comment_writer)
-            session.add_all(sql_post)
-            session.add(sql_writer)
             session.commit()
+            session.add(sql_writer)
+            session.add(sql_post)
             session.add(sql_comment_writer)
             session.commit()
+
+
 
