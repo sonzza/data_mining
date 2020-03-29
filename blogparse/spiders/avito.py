@@ -27,6 +27,6 @@ class AvitoSpider(scrapy.Spider):
         item.add_css('public_date', 'div.title-info-metadata-item-redesign::text')
         item.add_css('autor', 'div.seller-info-name a::text')
         item.add_css('autor_url', 'div.seller-info-name a::attr("href")')
+        item.add_css('flat_params', 'ul li.item-params-list-item ::text')
         item.add_xpath('photos', "//div[contains(@class, 'gallery-img-frame')]/@data-url")
         yield item.load_item()
-

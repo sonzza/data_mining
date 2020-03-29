@@ -36,7 +36,7 @@ class ImgPipeLine(ImagesPipeline):
             item['photos'] = [itm[1] for itm in results]
             item['autor'] = item['autor'].strip()
             item['public_date'] = item['public_date'].strip()
-            item['autor_url'] = f'https://avito.ru{item["autor_url"]}'
+            item['autor_url'] = f'http://avito.ru{item["autor_url"]}'
         return item
 
 
