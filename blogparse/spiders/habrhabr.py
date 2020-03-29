@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from datetime import datetime
 
 
 class HabrhabrSpider(scrapy.Spider):
@@ -44,7 +45,8 @@ class HabrhabrSpider(scrapy.Spider):
             'comment_count': response.css('span.post-stats__comments-count::text').extract_first(),
             'comment_writers': comment_writers,
             'tags': tags,
-            'hubs': hubs
+            'hubs': hubs,
+            'parsing_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
         yield data
