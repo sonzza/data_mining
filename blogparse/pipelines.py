@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from pymongo import MongoClient
-
 
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+import scrapy
+from scrapy.pipelines.images import ImagesPipeline
+from pymongo import MongoClient
 
 
 class BlogparsePipeline(object):
@@ -18,7 +19,29 @@ class BlogparsePipeline(object):
         collection.insert_one(item)
         return item
 
-#
-# class TempPipeline:
-#     def process_item(self, item, spider):
-#         return item
+
+class ImgPipeLine(ImagesPipeline):
+
+    def get_media_requests(self, item, info):
+
+        if item.get('photos'):
+            for img_url in item['photos']:
+                try:
+                    yield scrapy.Request(img_url)
+                except Exception as e:
+                    pass
+
+    def item_completed(self, results, item, info):
+        if results:
+            item['photos'] = [itm[1] for itm in results]
+            item['autor'] = item['autor'].strip()
+            item['public_date'] = item['public_date'].strip()
+            item['autor_url'] = f'https://avito.ru{item["autor_url"]}'
+        return item
+
+
+
+
+class TempPipeline:
+    def process_item(self, item, spider):
+        return item
