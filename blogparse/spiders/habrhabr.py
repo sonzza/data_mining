@@ -27,7 +27,7 @@ class HabrhabrSpider(scrapy.Spider):
         except AttributeError as e:
             hubs = []
         try:
-            comment_writers = [{'name': item.xpath('@data-user-login').extract(), 'url': item.xpath('@href').extract()}
+            comment_writers = [{'name': item.xpath('@data-user-login').extract_first(), 'url': item.xpath('@href').extract_first()}
                                for item in response.css('a.user-info_inline')]
         except AttributeError as e:
             comment_writers = {}
@@ -39,7 +39,7 @@ class HabrhabrSpider(scrapy.Spider):
                        'url': response.css(
                            'article.post header.post__meta a.post__user-info::attr("href")').extract_first()
                        },
-            'pub_date': response.css(
+            'public_time': response.css(
                 'article.post header.post__meta span.post__time::attr("data-time_published")').extract_first(),
             'comment_count': response.css('span.post-stats__comments-count::text').extract_first(),
             'comment_writers': comment_writers,
