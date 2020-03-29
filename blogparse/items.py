@@ -22,7 +22,7 @@ def clean_photo(values):
 
 
 def convert_params(values):
-    val = [itm for itm in values if ((itm.strip() != '') & (itm.strip() != '\n'))]
+    val = [itm.replace(':', '').strip() for itm in values if ((itm.strip() != '') & (itm.strip() != '\n'))]
     val = [val[i:i + 2] for i in range(0, len(val), 2)]
     values = dict(val)
     return values
