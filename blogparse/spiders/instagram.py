@@ -11,7 +11,7 @@ class InstagramSpider(scrapy.Spider):
     allowed_domains = ['instagram.com']
     graphql_url = 'https://www.instagram.com/graphql/query/?'
     start_urls = ['https://instagram.com/']
-    parse_users = ['realdonaldtrump', 'damedvedev', ]
+    parse_users = ['koma_jah', ]
     variables = {"id": '',
                  "include_reel": True,
                  "fetch_mutual": False,
@@ -20,7 +20,8 @@ class InstagramSpider(scrapy.Spider):
 
     def __init__(self, logpass: tuple, **kwargs):
         self.login, self.pwd = logpass
-        self.query_hash = 'c76146de99bb02f6415203be841dd25a'
+        self.query_hash_followers = 'c76146de99bb02f6415203be841dd25a'
+        self.query_hash_following = 'd04b0a864b4b54837c0d870b0e77e076'
         super().__init__(**kwargs)
 
     def parse(self, response):
@@ -41,15 +42,18 @@ class InstagramSpider(scrapy.Spider):
             for u_name in self.parse_users:
                 yield response.follow(
                     urljoin(self.start_urls[0], u_name),
-                    callback=self.parse_user,
-                    cb_kwargs={'user_name': u_name}
-                )
+                    callback=self.parse_user,dupefilter
+                    cb_kwargs={'user_name': u_name})
+                yield response.follow(
+                    urljoin(self.start_urls[0], u_name),
+                    callback=self.parse_by_user,
+                    cb_kwargs={'user_name': u_name})
 
     def parse_user(self, response, user_name: str):
         user_id = self.fetch_user_id(response.text, user_name)
         user_vars = deepcopy(self.variables)
         user_vars.update({'id': user_id})
-        url = self.make_grapthql_url(user_vars)
+        url = self.make_grapthql_url_followers(user_vars)
         yield response.follow(
             url,
             callback=self.parse_followers,
@@ -60,7 +64,7 @@ class InstagramSpider(scrapy.Spider):
         j_response = json.loads(response.text)
         if j_response['data']['user']['edge_followed_by']['page_info']['has_next_page']:
             user_vars.update({'after': j_response['data']['user']['edge_followed_by']['page_info']['end_cursor']})
-            url = self.make_grapthql_url(user_vars)
+            url = self.make_grapthql_url_followers(user_vars)
             yield response.follow(
                 url,
                 callback=self.parse_followers,
@@ -71,6 +75,34 @@ class InstagramSpider(scrapy.Spider):
 
         for follower in followers:
             yield {'user_name': user_name, 'user_id': user_vars['id'], 'follower': follower['node']}
+
+    def parse_by_user(self, response, user_name: str):
+        user_id = self.fetch_user_id(response.text, user_name)
+        user_vars = deepcopy(self.variables)
+        user_vars.update({'id': user_id})
+        url = self.make_grapthql_url_following(user_vars)
+        yield response.follow(
+            url,
+            callback=self.parse_following,
+            cb_kwargs={'user_vars': user_vars, 'user_name': user_name, }
+        )
+
+    def parse_following(self, response, user_vars, user_name):
+        j_response = json.loads(response.text)
+        if j_response['data']['user']['edge_follow']['page_info']['has_next_page']:
+            user_vars.update({'after': j_response['data']['user']['edge_follow']['page_info']['end_cursor']})
+            url = self.make_grapthql_url_following(user_vars)
+            yield response.follow(
+                url,
+                callback=self.parse_following,
+                cb_kwargs={'user_vars': user_vars, 'user_name': user_name}
+            )
+
+        following = j_response['data']['user']['edge_follow']['edges']
+
+        for follower in following:
+            yield {'user_name': user_name, 'user_id': user_vars['id'], 'following': follower['node']}
+
 
     def fetch_csrf_token(self, text):
         """Используя регулярные выражения парсит переданную строку на наличие
@@ -86,5 +118,8 @@ class InstagramSpider(scrapy.Spider):
         ).group()
         return json.loads(matched).get('id')
 
-    def make_grapthql_url(self, user_vars):
-        return f'{self.graphql_url}query_hash={self.query_hash}&{urlencode(user_vars)}'
+    def make_grapthql_url_followers(self, user_vars):
+        return f'{self.graphql_url}query_hash={self.query_hash_followers}&{urlencode(user_vars)}'
+
+    def make_grapthql_url_following(self, user_vars):
+        return f'{self.graphql_url}query_hash={self.query_hash_following}&{urlencode(user_vars)}'

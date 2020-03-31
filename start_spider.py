@@ -19,5 +19,5 @@ if __name__ == '__main__':
     # crawler_proc.crawl(GbBlogSpider)
     # crawler_proc.crawl(HabrhabrSpider)
     # crawler_proc.crawl(AvitoSpider)
-    crawler_proc.crawl(InstagramSpider, logpass=(os.getenv('LOGIN'), os.getenv('PASSWORD')))
+    crawler_proc.crawl(InstagramSpider, logpass=(os.getenv('INSTA_LOGIN'), os.getenv('INSTA_PASSWORD')))
     crawler_proc.start()
