@@ -15,7 +15,7 @@ SPIDER_MODULES = ['blogparse.spiders']
 NEWSPIDER_MODULE = 'blogparse.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:70.0) Gecko/20100101 Firefox/70.0'
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:69.0) Gecko/20100101 Firefox/69.0'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False

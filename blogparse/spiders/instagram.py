@@ -29,25 +29,27 @@ class InstagramSpider(scrapy.Spider):
         csrf_token = self.fetch_csrf_token(response.text)
 
         yield scrapy.FormRequest(
-            login_url,
-            method='POST',
-            callback=self.main_parse,
-            formdata={'username': self.login, 'password': self.pwd},
-            headers={'X-CSRFToken': csrf_token}
-        )
+                login_url,
+                method='POST',
+                callback=self.main_parse,
+                formdata={'username': self.login, 'password': self.pwd},
+                headers={'X-CSRFToken': csrf_token}
+            )
 
     def main_parse(self, response):
         j_resp = json.loads(response.text)
         if j_resp.get('authenticated'):
             for u_name in self.parse_users:
-                yield response.follow(
-                    urljoin(self.start_urls[0], u_name),
-                    callback=self.parse_user,dupefilter
-                    cb_kwargs={'user_name': u_name})
-                yield response.follow(
-                    urljoin(self.start_urls[0], u_name),
-                    callback=self.parse_by_user,
-                    cb_kwargs={'user_name': u_name})
+                if u_name:
+                    yield response.follow(
+                        urljoin(self.start_urls[0], u_name),
+                        callback=self.parse_user,
+                        dont_filter=True,
+                        cb_kwargs={'user_name': u_name})
+                    yield response.follow(
+                        urljoin(self.start_urls[0], u_name),
+                        callback=self.parse_by_user,
+                        cb_kwargs={'user_name': u_name})
 
     def parse_user(self, response, user_name: str):
         user_id = self.fetch_user_id(response.text, user_name)
@@ -102,7 +104,6 @@ class InstagramSpider(scrapy.Spider):
 
         for follower in following:
             yield {'user_name': user_name, 'user_id': user_vars['id'], 'following': follower['node']}
-
 
     def fetch_csrf_token(self, text):
         """Используя регулярные выражения парсит переданную строку на наличие
