@@ -63,3 +63,6 @@ if __name__ == '__main__':
                 file.write(json.dumps(post))
     with open('tags.json', 'w') as file:
         file.write(json.dumps(tags))
+    response = requests.get(URL, headers=headers)
+    soap = bs4.BeautifulSoup(response.text, 'lxml')
+    print(1)
