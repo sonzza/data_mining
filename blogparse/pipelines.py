@@ -37,7 +37,7 @@ class ImgPipeLine(ImagesPipeline):
             item['title'] = item['title'][0]
             item['price'] = item['price'][0]
             item['address'] = item['address'][0]
-            item['sqft'] = item['sqft'][0]
+            item['square'] = item['sqft'][0]
             item['photos'] = [itm[1] for itm in results]
             # item['autor'] = item['autor'].strip()
             # item['flat_params'] = item['flat_params'][0]
