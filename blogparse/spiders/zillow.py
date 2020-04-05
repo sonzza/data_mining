@@ -49,7 +49,7 @@ class ZillowSpider(scrapy.Spider):
         item.add_value('url', response.url)
         item.add_value('title', re.findall("\d+_zpid", response.url))
         item.add_value('price', self.browser.find_element_by_xpath('//*[@id="ds-container"]//h3/span').text)
-        item.add_value('address', self.browser.find_element_by_xpath('//*[@id="ds-container"]//h1/span').text)
+        item.add_value('address', self.browser.find_element_by_css_selector('h1.ds-address-container').text)
         item.add_value('sqft', [itm.text for itm in self.browser.find_elements_by_class_name('ds-bed-bath-living-area')][-4])
         yield item.load_item()
 
