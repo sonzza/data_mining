@@ -7,6 +7,7 @@ from blogparse import settings
 # from blogparse.spiders.gb_blog import GbBlogSpider
 # from blogparse.spiders.habrhabr import HabrhabrSpider
 from blogparse.spiders.avito import AvitoSpider
+from blogparse.spiders.zillow import ZillowSpider
 from blogparse.spiders.instagram import InstagramSpider
 
 env_path = Path(os.path.dirname(__file__), '.env')
@@ -19,5 +20,6 @@ if __name__ == '__main__':
     # crawler_proc.crawl(GbBlogSpider)
     # crawler_proc.crawl(HabrhabrSpider)
     # crawler_proc.crawl(AvitoSpider)
-    crawler_proc.crawl(InstagramSpider, logpass=(os.getenv('INSTA_LOGIN'), os.getenv('INSTA_PASSWORD')))
+    # crawler_proc.crawl(InstagramSpider, logpass=(os.getenv('INSTA_LOGIN'), os.getenv('INSTA_PASSWORD')))
+    crawler_proc.crawl(ZillowSpider)
     crawler_proc.start()

@@ -11,7 +11,7 @@ class InstagramSpider(scrapy.Spider):
     allowed_domains = ['instagram.com']
     graphql_url = 'https://www.instagram.com/graphql/query/?'
     start_urls = ['https://instagram.com/']
-    parse_users = ['koma_jah', ]
+    parse_users = ['koma_jah', 'kirulkin']
     variables = {"id": '',
                  "include_reel": True,
                  "fetch_mutual": False,

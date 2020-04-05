@@ -54,7 +54,12 @@ TELNETCONSOLE_ENABLED = False
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
+DOWNLOADER_MIDDLEWARES = {
+    # 'blogparse.middlewares.BlogparseDownloaderMiddleware': 543,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    'blogparse.middlewares.TooManyRequestsRetryMiddleware': 400,
+}
+
 #    'blogparse.middlewares.BlogparseDownloaderMiddleware': 543,
 # }
 
