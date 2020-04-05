@@ -9,12 +9,12 @@ import scrapy
 from scrapy.loader.processors import MapCompose, TakeFirst, Compose
 
 
-class BlogparseItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
-
-
+# class BlogparseItem(scrapy.Item):
+#     # define the fields for your item here like:
+#     # name = scrapy.Field()
+#     pass
+#
+#
 def clean_photo(values):
     if values[:2] == '//':
         return f'http:{values}'
@@ -40,8 +40,9 @@ class AvitoRealEstateItem(scrapy.Item):
 
 class ZillowItem(scrapy.Item):
     _id = scrapy.Field()
-    address = scrapy.Field(output_processor=TakeFirst())
-    price = scrapy.Field(output_processor=TakeFirst())
-    sqft = scrapy.Field(output_processor=TakeFirst())
-    url = scrapy.Field(output_processor=TakeFirst())
+    title = scrapy.Field()
+    url = scrapy.Field()
+    price = scrapy.Field()
+    address = scrapy.Field()
+    sqft = scrapy.Field()
     photos = scrapy.Field()
