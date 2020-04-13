@@ -4,7 +4,7 @@ import PyPDF2
 from PyPDF2.utils import PdfReadError
 from PIL import Image
 import pytesseract
-
+import datetime
 from pymongo import MongoClient
 
 pdf_file_path = '/Users/sonzza/PycharmProjects/data_mining/data_for_parse/'
@@ -76,10 +76,10 @@ def extract_number(file_path):
     pattern_2 = 'заводской номер (номера)'
 
     for idx, line in enumerate(text.split('\n')):
-        if line.lower().find(pattern) + 1:
+        if line.lower().find(pattern) != -1:
             number = text_en.split('\n')[idx].split(' ')[-1]
             numbers.append(number)
-        elif line.lower().find(pattern_2) + 1:
+        elif line.lower().find(pattern_2) != -1:
             number = text_en.split('\n')[idx - 2].split(' ')[-1]
             numbers.append(number)
     return numbers
@@ -88,11 +88,12 @@ def extract_number(file_path):
 if __name__ == '__main__':
     client_mongo = MongoClient('mongodb://127.0.0.1:27017/')
     db = client_mongo['data_for_parse']
+    print('start at: ', datetime.datetime.now())
 
     for root, dirs, files in os.walk(pdf_file_path):
 
         for file in files:
-            path_addr = root + file
+            path_addr = (root + '/' + file)
             if file.endswith('.pdf'):
                 try:
                     image_pdf = extract_pdf_image(path_addr)
@@ -122,15 +123,6 @@ if __name__ == '__main__':
                     pdf_non_result.append(info)
                     print(file)
 
-    # pdf_a = extract_files_pdf_path(pdf_file_path)
-
-    # for root, dirs, files in os.walk(pdf_file_path):
-    #     for file in files:
-    #         o = root + file
-    #         if file.endswith('.pdf'):
-    #             a = extract_pdf_image(o)
-    #             b = save_pdf_image(file, image_folder_path, *a)
-    #             c = [extract_number(itm) for itm in b]
-
     db['sn'].insert_many(pdf_result)
     db['no_sn'].insert_many(pdf_non_result)
+    print('finish at: ', datetime.datetime.now())
